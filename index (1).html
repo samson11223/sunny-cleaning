@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太陽專業清洗 — 月結單系統</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1565C0;--blue2:#E3F2FD;--gold:#F9A825;--goldbg:#FFFDE7;--green:#2E7D32;--greenbg:#E8F5E9;--red:#C62828;--redbg:#FFEBEE;--gray:#546E7A;--graybg:#ECEFF1;--bg:#F5F7FA;--border:#CFD8DC;--text:#1A2332;--text2:#546E7A;--r:10px}
+body{font-family:'PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.fullscreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0D47A1,#1976D2)}
+.centrecard{background:#fff;border-radius:20px;padding:44px 38px;width:min(400px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+.ltabs{display:flex;border:1.5px solid #CFD8DC;border-radius:8px;margin-bottom:24px;overflow:hidden}
+.ltab{flex:1;padding:10px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;border:none;color:#546E7A;font-family:inherit}
+.ltab.on{background:var(--blue);color:#fff}
+.linput{width:100%;padding:11px 14px;border:1.5px solid #CFD8DC;border-radius:8px;font-size:14px;margin-bottom:14px;font-family:inherit;outline:none}
+.lbtn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.lerr{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
+#appWrap{display:none;flex-direction:column;min-height:100vh}
+.topbar{background:var(--blue);color:#fff;height:56px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar-brand{font-size:16px;font-weight:700}
+.topbar-brand small{opacity:.7;font-size:12px;font-weight:400;margin-left:6px}
+.syncbadge{font-size:11px;padding:3px 10px;border-radius:12px}
+.s-ok{background:rgba(46,125,50,.35);color:#A5D6A7}
+.s-err{background:rgba(198,40,40,.35);color:#EF9A9A}
+.s-ing{background:rgba(255,255,255,.15);color:rgba(255,255,255,.85)}
+.logoutbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}
+.main{display:flex;flex:1}
+.sidebar{width:200px;background:#fff;border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0}
+.nsec{font-size:10px;font-weight:700;color:#90A4AE;letter-spacing:.8px;padding:10px 10px 4px;text-transform:uppercase}
+.navbtn{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:7px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text2);font-weight:500;font-family:inherit}
+.navbtn:hover{background:var(--graybg)}
+.navbtn.on{background:var(--blue2);color:var(--blue)}
+.content{flex:1;padding:24px;overflow-y:auto}
+.page{display:none}.page.on{display:block}
+.ptitle{font-size:20px;font-weight:700;margin-bottom:6px}
+.psub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.flabel{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;display:block}
+.finput{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;outline:none}
+.finput:focus{border-color:var(--blue)}
+.fsel{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-out{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+.btn-red{background:var(--redbg);color:var(--red);border:1px solid #FFCDD2;padding:5px 11px;font-size:12px;cursor:pointer;border-radius:6px;font-family:inherit}
+.btn-green{background:var(--greenbg);color:var(--green);border:1px solid #C8E6C9;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:inherit}
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:10px;font-weight:600}
+.bb{background:var(--blue2);color:var(--blue)}.by{background:var(--goldbg);color:#7B6000}
+.bo{background:#FFF3E0;color:#E65100}.bp{background:#F3E5F5;color:#6A1B9A}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#F0F4F8;padding:9px 12px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border)}
+td{padding:8px 12px;border-bottom:1px solid var(--graybg);vertical-align:middle}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.statcard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.stlabel{font-size:11px;color:var(--text2);margin-bottom:4px}
+.stval{font-size:22px;font-weight:700;color:var(--blue)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.ccard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.ccard:hover{border-color:var(--blue);box-shadow:0 4px 16px rgba(21,101,192,.12)}
+.mbar{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:18px;flex-wrap:wrap}
+.px-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--graybg)}
+.px-row:last-child{border-bottom:none}
+.px-inp{width:80px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;text-align:center;font-family:inherit;outline:none}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:#fff;border-radius:14px;padding:20px;width:min(720px,96vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-sm{background:#fff;border-radius:14px;padding:28px;width:min(520px,92vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.inv{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.invh{background:var(--blue);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:flex-start}
+.invb{padding:22px 28px}
+.invt{width:100%;border-collapse:collapse;font-size:11px}
+.invt th{background:#F0F4F8;padding:7px 8px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border)}
+.invt td{padding:5px 8px;border-bottom:1px solid var(--graybg)}
+.sumt{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}
+.sumt th{background:var(--blue);color:#fff;padding:6px 9px}
+.sumt td{padding:5px 9px;border-bottom:1px solid var(--graybg)}
+.totbox{margin-top:14px;padding:13px 18px;background:var(--goldbg);border:2px solid var(--gold);border-radius:7px;display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+
+<div id="loginWrap" class="fullscreen">
+  <div class="centrecard">
+    <div style="font-size:36px;font-weight:700;color:var(--blue);margin-bottom:6px">S</div>
+    <div style="font-size:20px;font-weight:700;color:var(--blue);margin-bottom:3px">太陽專業清洗</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:26px">SUNNY PROFESSIONAL CLEANING</div>
+    <div class="ltabs">
+      <button class="ltab on" id="tboss" onclick="setRole('boss')">老闆登入</button>
+      <button class="ltab" id="tstaff" onclick="setRole('staff')">員工登入</button>
+    </div>
+    <input class="linput" type="password" id="pw" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')login()">
+    <button class="lbtn" onclick="login()">登入系統</button>
+    <div class="lerr" id="lerr"></div>
+    <div id="loginHint" style="margin-top:12px;font-size:11px;color:#90A4AE"></div>
+  </div>
+</div>
+
+<div id="appWrap">
+  <div class="topbar">
+    <div class="topbar-brand">太陽專業清洗<small>月結單系統</small></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="syncbadge s-ing" id="syncBadge">連接中</span>
+      <span class="syncbadge" id="rbadge" style="background:rgba(255,255,255,.18);color:#fff"></span>
+      <button class="logoutbtn" onclick="logout()">登出</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="sidebar">
+      <div class="nsec">功能</div>
+      <button class="navbtn on" id="n-entry" onclick="go('entry')">每日數量輸入</button>
+      <button class="navbtn" id="n-summary" onclick="go('summary')" style="display:none">月結單總覽</button>
+      <button class="navbtn" id="n-generate" onclick="go('generate')" style="display:none">生成PDF收據</button>
+      <button class="navbtn" id="n-prices" onclick="go('prices')" style="display:none">單價管理</button>
+      <div class="nsec">系統</div>
+      <button class="navbtn" id="n-settings" onclick="go('settings')" style="display:none">設定</button>
+    </div>
+    <div class="content">
+
+      <!-- ENTRY -->
+      <div class="page on" id="p-entry">
+        <div class="ptitle">每日數量輸入</div>
+        <div class="psub">選擇客戶和日期，輸入各類毛巾數量</div>
+        <div class="card">
+          <div class="row2" style="margin-bottom:14px">
+            <div><label class="flabel">選擇客戶</label>
+              <select class="fsel" id="eClient" onchange="loadTable()"><option value="">-- 請選擇 --</option></select></div>
+            <div><label class="flabel">日期</label>
+              <input class="finput" type="date" id="eDate"></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="flabel">貨單編號（可選）</label>
+            <input class="finput" type="text" id="eRef" placeholder="例: 767" style="max-width:180px">
+          </div>
+          <div id="etArea" style="display:none">
+            <div style="overflow-x:auto;margin-bottom:14px"><table id="etTable"></table></div>
+            <!-- Extra custom items -->
+            <div style="margin-bottom:14px;background:#F8F9FA;border-radius:8px;padding:14px;border:1px solid #E0E0E0">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-size:13px;font-weight:600;color:#546E7A">其他品項（特別清洗）</div>
+                <div id="extraPriceNote" style="font-size:11px;color:#1565C0;display:none">老闆模式：新品項需填單價</div>
+              </div>
+              <div id="extraItemsList"></div>
+              <button type="button" onclick="addExtraItem()" style="background:none;border:1.5px dashed #90A4AE;color:#546E7A;padding:7px 16px;border-radius:7px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:6px">＋ 增加品項</button>
+            </div>
+            <button class="btn btn-blue" onclick="saveEntry()" id="saveEntryBtn">儲存記錄</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:14px;font-weight:700">記錄查詢與修改</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select id="filterClient" onchange="renderRecent()" style="padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:12px;font-family:inherit;outline:none">
+              <option value="">所有客戶</option>
+            </select>
+            <input type="month" id="filterMonth" onchange="renderRecent()" style="padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:12px;font-family:inherit;outline:none">
+            <button onclick="document.getElementById('filterClient').value='';document.getElementById('filterMonth').value='';renderRecent()" style="padding:6px 10px;border:1px solid #CFD8DC;border-radius:7px;font-size:12px;background:#fff;cursor:pointer;font-family:inherit">清除篩選</button>
+            <button id="batchDelBtn" onclick="batchDel(this)" style="padding:6px 12px;border:1px solid #FFCDD2;border-radius:7px;font-size:12px;background:#FFEBEE;color:#C62828;cursor:pointer;font-family:inherit;font-weight:600">批量刪除篩選結果</button>
+          </div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="overflow-x:auto">
+            <table><thead><tr><th>日期</th><th>客戶</th><th>貨單</th><th>總量</th><th>來源</th><th>操作</th></tr></thead>
+            <tbody id="recentTb"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="page" id="p-summary">
+        <div class="ptitle">月結單總覽</div>
+        <div class="psub">各客戶當月金額</div>
+        <div class="mbar">
+          <span style="font-size:13px;font-weight:600;color:var(--text2)">月份：</span>
+          <input class="finput" type="month" id="sumMonth" style="width:155px" onchange="renderSum()">
+        </div>
+        <div class="statgrid" id="sumStats"></div>
+        <div class="cgrid" id="sumGrid"></div>
+      </div>
+
+      <!-- GENERATE -->
+      <div class="page" id="p-generate">
+        <div class="ptitle">生成PDF收據</div>
+        <div class="psub">預覽並下載各客戶收據</div>
+        <div class="mbar">
+          <span style="font-size:13px;font-weight:600;color:var(--text2)">月份：</span>
+          <input class="finput" type="month" id="genMonth" style="width:155px" onchange="renderGen()">
+          <button class="btn btn-blue" style="margin-left:auto" onclick="dlAll()">全部下載</button>
+        </div>
+        <div class="cgrid" id="genGrid"></div>
+      </div>
+
+      <!-- PRICES -->
+      <div class="page" id="p-prices">
+        <div class="ptitle">單價管理</div>
+        <div class="psub">各客戶毛巾單價（老闆可修改）</div>
+        <div id="priceList"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="p-settings">
+        <div class="ptitle">系統設定</div>
+        <div class="psub">管理雲端連接</div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px">Google Apps Script 網址</div>
+          <input class="finput" type="text" id="settingsUrl" style="margin-bottom:10px">
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <button class="btn btn-blue" onclick="saveUrl(this)">儲存並測試</button>
+            <button class="btn btn-out" onclick="go('entry')">取消</button>
+          </div>
+          <div id="urlMsg" style="font-size:13px;min-height:18px"></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px">Invoice 編號管理</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:14px">自行設定每間店的 Invoice 編號</div>
+          <div id="invNoList"></div>
+          <button class="btn btn-blue" style="width:auto;padding:9px 20px;margin-top:10px" onclick="saveInvNos(this)">儲存編號</button>
+          <div id="invNoMsg" style="font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px">Invoice 編號管理</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:14px">自行設定每間店的 Invoice 編號</div>
+          <div id="invNoList"></div>
+          <button class="btn btn-blue" style="width:auto;padding:9px 20px;margin-top:10px" onclick="saveInvNos(this)">儲存編號</button>
+          <div id="invNoMsg" style="font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px">Invoice 編號管理</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:14px">自行設定每間店的 Invoice 編號（如：026、027）</div>
+          <div id="invNoList"></div>
+          <button class="btn btn-blue" style="width:auto;padding:9px 20px;margin-top:10px" onclick="saveInvNos(this)">儲存編號</button>
+          <div id="invNoMsg" style="font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px">清除重複記錄</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:10px">自動保留每個客戶每天第一條記錄，刪除重複</div>
+          <button class="btn btn-blue" onclick="dedup(this)">清除重複記錄</button>
+          <div id="dedupMsg" style="font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px">新增合作店舖</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:12px">新增後會出現在客戶選單，員工可以輸入數量</div>
+          <div class="row2" style="margin-bottom:10px">
+            <div><label class="flabel">店舖名稱</label><input class="finput" type="text" id="newClientName" placeholder="例：新店舖"></div>
+            <div><label class="flabel">類型</label>
+              <select class="fsel" id="newClientType">
+                <option value="cn">月結單（中文）</option>
+                <option value="inv">Invoice（英文）</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <label class="flabel">品項（用逗號分隔）</label>
+            <input class="finput" type="text" id="newClientCols" placeholder="例：大毛巾,細毛巾,浴袍">
+          </div>
+          <div id="newClientInvFields" style="display:none;margin-bottom:10px">
+            <div class="row2">
+              <div><label class="flabel">Invoice 編號</label><input class="finput" type="text" id="newClientInvNo" placeholder="例：029"></div>
+              <div><label class="flabel">收款公司名稱</label><input class="finput" type="text" id="newClientBillTo" placeholder="例：XXX有限公司"></div>
+            </div>
+          </div>
+          <button class="btn btn-blue" style="width:auto;padding:9px 20px" onclick="addNewClient()">新增店舖</button>
+          <div id="newClientMsg" style="font-size:13px;margin-top:8px;min-height:18px"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--red)">危險操作</div>
+          <button class="btn" style="background:var(--redbg);color:var(--red);border:1px solid #FFCDD2" onclick="if(confirm('確定清除？')){localStorage.removeItem('sunny_gas_url');location.reload();}">清除雲端網址（重新設定）</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="modal-sm">
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px">修改記錄數量</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px" id="editDesc"></div>
+    <div style="margin-bottom:14px">
+      <label class="flabel">貨單編號</label>
+      <input class="finput" type="text" id="editRef" style="max-width:180px">
+    </div>
+    <div style="overflow-x:auto;margin-bottom:18px"><table id="editTable"></table></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-out" onclick="closeEdit()">取消</button>
+      <button class="btn btn-blue" onclick="saveEdit(this)">儲存修改</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="overlay" id="prevOverlay">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:700" id="prevTitle">預覽</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" onclick="dlPDF()">下載PDF</button>
+        <button class="btn btn-out" onclick="closePrev()">關閉</button>
+      </div>
+    </div>
+    <div id="prevArea"></div>
+  </div>
+</div>
+
+<!-- PRICE MODAL -->
+<div class="overlay" id="pxOverlay">
+  <div class="modal-sm">
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px">單價已修改</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px" id="pxDesc"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer">
+        <input type="radio" name="pxOpt" value="keep" checked style="margin-top:2px">
+        <div><div style="font-size:13px;font-weight:600">只影響今後新記錄（推薦）</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">過去已收款項維持原價</div></div>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer">
+        <input type="radio" name="pxOpt" value="all" style="margin-top:2px">
+        <div><div style="font-size:13px;font-weight:600">所有月份按新單價重算</div></div>
+      </label>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-out" onclick="cancelPx()">取消</button>
+      <button class="btn btn-blue" onclick="confirmPx()">確認</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" style="display:none;position:fixed;bottom:22px;right:22px;background:var(--blue);color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25)"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const CLIENTS={
+  jing_macau:{name:'靜水療月結單（澳門）',sn:'靜水療（澳門）',type:'cn',cols:['大毛巾','細毛巾','毛巾床單','普通浴袍','短袖衫','短褲','枕頭套','坐墊'],defPx:[3,2,3,6,3,3,3,6]},
+  jing_taipa:{name:'靜水療月結單（氹仔）',sn:'靜水療（氹仔）',type:'cn',cols:['大毛巾','細毛巾','毛巾床單','普通浴袍','短袖衫','短褲','枕頭套','染色處理'],defPx:[3,2,3,6,3,3,3,10]},
+  tai_macau:{name:'泰壐月結單（澳門）',sn:'泰壐（澳門）',type:'cn',cols:['大毛巾','細毛巾','毛巾床單','普通浴袍','短袖衫','短褲','枕頭套','凳套'],defPx:[4,2,4,6,3,3,3,3]},
+  tai_macau_h:{name:'泰壐月結單（澳門4店H）',sn:'泰壐（澳門4店H）',type:'cn',cols:['大毛巾','細毛巾','毛巾床單','普通浴袍','短袖衫','短褲','床罩','地毯'],defPx:[4,2,4,6,3,3,3,6]},
+  tai_taipa:{name:'泰壐月結單（氹仔）',sn:'泰壐（氹仔）',type:'cn',cols:['大毛巾','細毛巾','毛巾床單','普通浴袍','短袖衫','短褲','枕頭套','地墊'],defPx:[4,2,4,6,3,3,3,6]},
+  song_rong:{name:'松蓉莊月結單',sn:'松蓉莊',type:'cn',cols:['大毛巾','細毛巾','床笠','浴袍','枱布','衫','褲','地毯','枕頭套'],defPx:[6,3,6,8,10,4,4,15,4]},
+  fg_sc:{name:'Five Guys（金銀島）',sn:'Five Guys SC',type:'inv',invNo:'026',billTo:'盈亮有限公司',addr:'澳門路氹連貫公路新濠影匯二樓2150號(Five Guys)',sum:true,pay:true,cols:['細毛巾','圍裙'],defPx:[1.7,4.0]},
+  fg_v:{name:'Five Guys（威尼斯人）',sn:'Five Guys V',type:'inv',invNo:'028',billTo:'盈亮有限公司',addr:'澳門路氹聖德聖母灣大馬路威尼斯人度假村酒店大運河購物中心1033&1035 鋪FiveGuys',sum:true,pay:true,cols:['細毛巾','圍裙'],defPx:[1.7,4.0]},
+  fg_t:{name:'Five Guys（新濠影滙）',sn:'Five Guys T',type:'inv',invNo:'027',billTo:'盈亮有限公司',addr:'澳門南灣區湖濱路12號金銀島名勝世界度假村購物中心\n地面層L1-CD-01鋪Five Guys',sum:true,pay:true,cols:['細毛巾','圍裙'],defPx:[1.7,4.0]},
+  ufc:{name:'UFC Gym',sn:'UFC Gym',type:'inv',invNo:'025',billTo:'澳門盈南有限公司',addr:'澳門南灣區湖濱路12號金銀島名勝世界度假村購物中心L1-FR-01鋪(UFC)',sum:true,pay:true,cols:['浴巾','細毛巾','長椅套','圓椅套'],defPx:[2.7,1.7,4.5,2.7]}
+};
+const CO='太陽專業清洗',CO_EN='SUNNY PROFESSIONAL CLEANING';
+const BANK='中銀轉賬戶口（葡幣）: 185000128959710\n戶口名稱: 太陽專業清洗';
+const BP='boss888',SP='staff123';
+
+// ── STATE ─────────────────────────────────────────────────────
+let role='staff',selRole='boss',entries=[],priceHistory={};
+let editingId=null,pendingPx=null,curCk=null,curMonth=null;
+
+// ── API ───────────────────────────────────────────────────────
+function getUrl(){return localStorage.getItem('sunny_gas_url')||'';}
+
+async function api(action,body={}){
+  const url=getUrl();
+  if(!url)throw new Error('未設定網址');
+  if(action==='saveBatch'&&body.entries&&body.entries.length>20){
+    const chunks=[];
+    for(let i=0;i<body.entries.length;i+=20)chunks.push(body.entries.slice(i,i+20));
+    let total=0;
+    for(const chunk of chunks){const r=await api('saveBatch',{entries:chunk});total+=r.count||0;}
+    return{ok:true,count:total};
+  }
+  const params=new URLSearchParams({action});
+  for(const[k,v]of Object.entries(body)){
+    const key=k==='entries'?'e':k==='prices'?'p':k==='entry'?'e':k==='ids'?'e':k;
+    params.append(key,typeof v==='object'?JSON.stringify(v):String(v));
+  }
+  const fullUrl=url+'?'+params.toString();
+  try{
+    const res=await fetch(fullUrl,{redirect:'follow'});
+    const data=JSON.parse(await res.text());
+    if(data.error)throw new Error(data.error);
+    return data;
+  }catch(fe){
+    return new Promise((resolve,reject)=>{
+      const cb='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+      window[cb]=(data)=>{
+        delete window[cb];
+        try{document.head.removeChild(sc);}catch(e){}
+        if(data&&data.error)reject(new Error(data.error));else resolve(data);
+      };
+      const sc=document.createElement('script');
+      sc.src=fullUrl+'&callback='+cb;
+      sc.onerror=()=>{delete window[cb];try{document.head.removeChild(sc);}catch(e){}reject(new Error('連接失敗'));};
+      setTimeout(()=>{if(window[cb]){delete window[cb];try{document.head.removeChild(sc);}catch(e){}reject(new Error('連接超時'));}},30000);
+      document.head.appendChild(sc);
+    });
+  }
+}
+
+function setSyncBadge(s,msg){
+  const b=document.getElementById('syncBadge');
+  b.className='syncbadge '+(s==='ok'?'s-ok':s==='err'?'s-err':'s-ing');
+  b.textContent=msg;
+}
+
+async function loadCloud(){
+  setSyncBadge('ing','同步中...');
+  try{
+    const data=await api('getAll');
+    entries=data.entries||[];
+    priceHistory=data.prices||{};
+    Object.keys(CLIENTS).forEach(k=>{
+      if(!priceHistory[k])priceHistory[k]=[{px:[...CLIENTS[k].defPx],from:'2000-01',to:'2099-12'}];
+    });
+    // Fix dates: normalize T16:00:00.000Z format
+    entries.forEach(e=>{if(e.date&&e.date.length>10)e.date=e.date.slice(0,10);});
+    const seeded=localStorage.getItem('sunny_seeded');
+    if(entries.length===0&&!seeded){
+      setSyncBadge('ing','首次使用，請在設定頁面輸入GAS網址');
+    }
+    setSyncBadge('ok','已同步 ✓');
+    renderRecent();
+    if(role==='boss'){renderSum();renderGen();renderPrices();}
+  }catch(err){
+    setSyncBadge('err','同步失敗');
+    toast('連接失敗：'+err.message,6000);
+  }
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function setRole(r){
+  selRole=r;
+  document.getElementById('tboss').className='ltab'+(r==='boss'?' on':'');
+  document.getElementById('tstaff').className='ltab'+(r==='staff'?' on':'');
+  document.getElementById('loginHint').textContent=r==='staff'?'員工密碼: staff123':'';
+}
+function login(){
+  const p=document.getElementById('pw').value;
+  if(selRole==='boss'&&p===BP){role='boss';launch();}
+  else if(selRole==='staff'&&p===SP){role='staff';launch();}
+  else document.getElementById('lerr').textContent='密碼錯誤';
+}
+function launch(){
+  // Load saved invoice numbers
+  try{
+    const svn=JSON.parse(localStorage.getItem('sunny_invnos')||'{}')
+    Object.entries(svn).forEach(([k,v])=>{if(CLIENTS[k])CLIENTS[k].invNo=v;});
+  }catch(e){}
+    // Load saved invoice numbers
+  try{
+    var svn=JSON.parse(localStorage.getItem('sunny_invnos')||'{}');
+    Object.keys(svn).forEach(function(k){if(CLIENTS[k])CLIENTS[k].invNo=svn[k];});
+  }catch(e){}
+  // Load custom clients from localStorage
+  try{
+    const custom=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
+    Object.entries(custom).forEach(([k,v])=>{CLIENTS[k]=v;});
+  }catch(e){}
+  // Load saved invoice numbers
+  try{
+    const saved=JSON.parse(localStorage.getItem('sunny_invnos')||'{}');
+    Object.entries(saved).forEach(([k,v])=>{if(CLIENTS[k])CLIENTS[k].invNo=v;});
+  }catch(e){}
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appWrap').style.display='flex';
+  document.getElementById('rbadge').textContent=role==='boss'?'老闆模式':'員工模式';
+  const bossOnly=['n-summary','n-generate','n-prices','n-settings'];
+  bossOnly.forEach(id=>document.getElementById(id).style.display=role==='boss'?'block':'none');
+  if(role==='boss'){
+    const now=new Date();
+    const m=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    document.getElementById('sumMonth').value=m;
+    document.getElementById('genMonth').value=m;
+    document.getElementById('settingsUrl').value=getUrl();
+  }
+  initSelects();
+  document.getElementById('eDate').value=new Date().toISOString().split('T')[0];
+  if(entries.length>0){
+    setSyncBadge('ok','已同步 ✓');
+    renderRecent();
+    if(role==='boss'){renderSum();renderGen();renderPrices();}
+  }else{loadCloud();}
+  // Warn if no GAS URL set
+  if(!getUrl()){
+    setSyncBadge('err','未設定網址');
+    toast('⚠️ 請到「設定」頁面輸入 Google Apps Script 網址',8000);
+  }
+}
+function logout(){
+  role='staff';
+  document.getElementById('appWrap').style.display='none';
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('pw').value='';
+  document.getElementById('lerr').textContent='';
+}
+
+// ── NAV ───────────────────────────────────────────────────────
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.className='page');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+id).className='page on';
+  document.getElementById('n-'+id).classList.add('on');
+  if(id==='summary')renderSum();
+  if(id==='generate')renderGen();
+  if(id==='settings')renderInvNos();
+}
+
+// ── ENTRY ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  const typeEl=document.getElementById('newClientType');
+  if(typeEl) typeEl.addEventListener('change',function(){
+    document.getElementById('newClientInvFields').style.display=this.value==='inv'?'block':'none';
+  });
+});
+
+function addNewClient(){
+  const name=(document.getElementById('newClientName').value||'').trim();
+  const type=document.getElementById('newClientType').value;
+  const colsRaw=(document.getElementById('newClientCols').value||'').trim();
+  const msg=document.getElementById('newClientMsg');
+  if(!name||!colsRaw){msg.textContent='請填寫店舖名稱和品項';msg.style.color='var(--red)';return;}
+  const cols=colsRaw.split(/[,，]/).map(s=>s.trim()).filter(Boolean);
+  if(!cols.length){msg.textContent='請填寫至少一個品項';msg.style.color='var(--red)';return;}
+  
+  // Generate a key from name
+  const key='custom_'+name.replace(/[^a-zA-Z0-9一-鿿]/g,'_').slice(0,20)+'_'+Date.now().toString().slice(-4);
+  
+  const newClient={
+    name:name+'月結單',sn:name,type,
+    cols,defPx:cols.map(()=>0),
+  };
+  if(type==='inv'){
+    newClient.invNo=document.getElementById('newClientInvNo').value||'000';
+    newClient.billTo=document.getElementById('newClientBillTo').value||name;
+    newClient.addr='';newClient.sum=true;newClient.pay=true;
+  }
+  
+  // Save to localStorage
+  const custom=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
+  custom[key]=newClient;
+  localStorage.setItem('sunny_custom_clients',JSON.stringify(custom));
+  
+  // Add to CLIENTS
+  CLIENTS[key]=newClient;
+  initSelects();renderPrices();
+  
+  msg.textContent='✅ 已新增「'+name+'」！';msg.style.color='var(--green)';
+  document.getElementById('newClientName').value='';
+  document.getElementById('newClientCols').value='';
+  toast('新店舖「'+name+'」已新增，員工可以立即輸入數量');
+}
+
+function initSelects(){
+  ['eClient','filterClient'].forEach(sid=>{
+    const s=document.getElementById(sid);if(!s)return;
+    s.innerHTML=sid==='filterClient'?'<option value="">所有客戶</option>':'<option value="">-- 請選擇 --</option>';
+    Object.entries(CLIENTS).forEach(([k,c])=>{const o=document.createElement('option');o.value=k;o.textContent=c.sn;s.appendChild(o);});
+  });
+}
+let _extraCount=0;
+function addExtraItem(){
+  const id='ex_'+(_extraCount++);
+  const div=document.createElement('div');
+  div.id=id;
+  div.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap';
+  const pxField=role==='boss'?`<span style="font-size:12px;color:#90A4AE">MOP$</span><input type="number" min="0" step="0.1" value="" id="${id}_p" placeholder="單價" style="width:70px;padding:7px 8px;border:1.5px solid #FFB74D;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;background:#FFFDE7">`:'';
+  div.innerHTML=`<input type="text" placeholder="品項名稱（如：地毯）" id="${id}_n" style="flex:1;min-width:120px;padding:7px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:13px;font-family:inherit;outline:none"><input type="number" min="0" value="0" id="${id}_q" style="width:65px;padding:7px 8px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none"><span style="font-size:12px;color:#90A4AE">件</span>${pxField}<button type="button" onclick="document.getElementById('${id}').remove()" style="background:none;border:none;color:#EF5350;cursor:pointer;font-size:18px;line-height:1;padding:0 4px">×</button>`;
+  document.getElementById('extraItemsList').appendChild(div);
+  if(role==='boss') document.getElementById('extraPriceNote').style.display='block';
+}
+function loadTable(){
+  const k=document.getElementById('eClient').value,area=document.getElementById('etArea');
+  if(!k){area.style.display='none';return;}
+  document.getElementById('extraItemsList').innerHTML='';
+  _extraCount=0;
+  const c=CLIENTS[k];area.style.display='block';
+  document.getElementById('etTable').innerHTML=
+    '<thead><tr><th>品項</th><th style="text-align:right">數量</th></tr></thead><tbody>'+
+    c.cols.map((_,i)=>`<tr><td style="padding:7px 12px;border-bottom:1px solid #ECEFF1">${c.cols[i]}</td><td style="padding:7px 12px;border-bottom:1px solid #ECEFF1;text-align:right"><input type="number" min="0" value="0" id="q${i}" style="width:70px;padding:5px 8px;border:1.5px solid #CFD8DC;border-radius:6px;font-size:13px;text-align:center;font-family:inherit;outline:none"></td></tr>`).join('')+
+    '</tbody>';
+}
+async function saveEntry(){
+  const k=document.getElementById('eClient').value,d=document.getElementById('eDate').value,r=document.getElementById('eRef').value;
+  if(!k||!d){alert('請選擇客戶和日期');return;}
+  const c=CLIENTS[k],q=c.cols.map((_,i)=>parseInt(document.getElementById('q'+i).value)||0);
+  // Collect extra custom items
+  const extras=[];
+  let extraBossPx={};
+  document.querySelectorAll('#extraItemsList>div[id^="ex_"]').forEach(div=>{
+    const name=(div.querySelector('[id$="_n"]')?.value||'').trim();
+    const qty=parseInt(div.querySelector('[id$="_q"]')?.value)||0;
+    const pxEl=div.querySelector('[id$="_p"]');
+    const px=pxEl?parseFloat(pxEl.value)||0:0;
+    if(name&&qty>0){
+      extras.push({name,qty,px:role==='boss'?px:0});
+      if(role==='boss'&&px>0) extraBossPx[name]=px;
+    }
+  });
+  // If boss added extras with prices, save to priceHistory as custom cols
+  if(role==='boss'&&Object.keys(extraBossPx).length>0){
+    Object.entries(extraBossPx).forEach(([name,px])=>{
+      if(!CLIENTS[k].cols.includes(name)){
+        // Add to client cols temporarily (session only - boss should update via price management)
+        toast('提示：新品項「'+name+'」已記錄，如需長期使用請在「單價管理」正式設定');
+      }
+    });
+  }
+  const extraTotal=extras.reduce((a,e)=>a+e.qty,0);
+  const entry={id:Date.now(),clientKey:k,date:d.slice(0,10),ref:r,qtys:q,
+    total:q.reduce((a,b)=>a+b,0)+extraTotal,
+    extras:extras.length?extras:undefined,src:'manual'};
+  const btn=document.getElementById('saveEntryBtn');
+  btn.textContent='儲存中...';btn.disabled=true;btn.style.opacity='0.6';
+  try{
+    const result=await api('saveEntry',{entry});
+    if(!result.ok)throw new Error(JSON.stringify(result));
+    entries.push(entry);
+    c.cols.forEach((_,i)=>document.getElementById('q'+i).value=0);
+    document.getElementById('eRef').value='';
+    renderRecent();setSyncBadge('ok','已同步 ✓');toast('✓ 記錄已儲存！');
+  }catch(e){toast('❌ 儲存失敗：'+e.message,8000);setSyncBadge('err','同步失敗');}
+  btn.textContent='儲存記錄';btn.disabled=false;btn.style.opacity='1';
+}
+function renderRecent(){
+  const fc=document.getElementById('filterClient')?.value||'';
+  const fm=document.getElementById('filterMonth')?.value||'';
+  const rows=[...entries].filter(e=>{
+    const d=(e.date||'').slice(0,10);
+    if(fc&&e.clientKey!==fc)return false;
+    if(fm&&!d.startsWith(fm))return false;
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('recentTb').innerHTML=rows.map(e=>{
+    const c=CLIENTS[e.clientKey];
+    const d=(e.date||'').slice(0,10);
+    const sb=e.src==='pre'?'bo':e.src==='upload'?'bg':'bp';
+    const sl=e.src==='pre'?'預載':e.src==='upload'?'上載':'手動';
+    const extrasStr=e.extras&&e.extras.length?' +'+e.extras.map(x=>x.name+'×'+x.qty).join(','):'';
+    return `<tr><td>${d}</td><td><span class="badge bb">${c?c.sn:e.clientKey}</span></td><td>${e.ref||'-'}</td><td style="font-weight:600">${e.total}${extrasStr?'<br><span style="font-size:10px;color:#E65100">'+extrasStr+'</span>':''}</td><td><span class="badge ${sb}">${sl}</span></td><td style="white-space:nowrap"><button class="btn-green" style="margin-right:4px" onclick="openEdit('${e.id}')">修改</button><button class="btn-red" onclick="delE('${e.id}')">刪</button></td></tr>`;
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:#546E7A;padding:20px">沒有記錄</td></tr>';
+}
+
+// ── EDIT ──────────────────────────────────────────────────────
+function openEdit(id){
+  const e=entries.find(x=>String(x.id)===String(id));if(!e)return;
+  const c=CLIENTS[e.clientKey];editingId=id;
+  document.getElementById('editDesc').textContent=c.sn+' — '+(e.date||'').slice(0,10);
+  document.getElementById('editRef').value=e.ref||'';
+  // Build qtys table
+  let extraRows='';
+  if(e.extras&&e.extras.length){
+    extraRows='<tr><td colspan="2" style="padding:10px 12px 4px;font-weight:600;font-size:12px;color:#546E7A;border-top:2px solid #E0E0E0">其他品項</td></tr>'+
+    e.extras.map((x,i)=>`<tr><td style="padding:7px 12px;border-bottom:1px solid #ECEFF1;color:#E65100">${x.name}</td><td style="padding:7px 12px;border-bottom:1px solid #ECEFF1;text-align:right"><input type="number" min="0" value="${x.qty||0}" id="eex${i}" style="width:75px;padding:5px 8px;border:1.5px solid #FFB74D;border-radius:6px;font-size:13px;text-align:center;font-family:inherit;outline:none"></td></tr>`).join('');
+  }
+  document.getElementById('editTable').innerHTML=
+    '<thead><tr><th>品項</th><th style="text-align:right">數量</th></tr></thead><tbody>'+
+    c.cols.map((col,i)=>`<tr><td style="padding:7px 12px;border-bottom:1px solid #ECEFF1">${col}</td><td style="padding:7px 12px;border-bottom:1px solid #ECEFF1;text-align:right"><input type="number" min="0" value="${e.qtys[i]||0}" id="eq${i}" style="width:75px;padding:5px 8px;border:1.5px solid #CFD8DC;border-radius:6px;font-size:13px;text-align:center;font-family:inherit;outline:none"></td></tr>`).join('')+
+    extraRows+'</tbody>';
+  document.getElementById('editOverlay').className='overlay on';
+}
+function closeEdit(){editingId=null;document.getElementById('editOverlay').className='overlay';}
+async function saveEdit(btn){
+  const e=entries.find(x=>String(x.id)===String(editingId));if(!e)return;
+  const c=CLIENTS[e.clientKey];
+  e.ref=document.getElementById('editRef').value;
+  e.qtys=c.cols.map((_,i)=>parseInt(document.getElementById('eq'+i).value)||0);
+  // Update extras if they exist
+  if(e.extras&&e.extras.length){
+    e.extras=e.extras.map((x,i)=>{
+      const el=document.getElementById('eex'+i);
+      return {...x, qty: el?parseInt(el.value)||0:x.qty};
+    });
+  }
+  const extraTotal=e.extras?e.extras.reduce((a,x)=>a+x.qty,0):0;
+  e.total=e.qtys.reduce((a,b)=>a+b,0)+extraTotal;
+  btn.textContent='儲存中...';btn.disabled=true;
+  try{
+    await api('updateEntry',{entry:e});
+    closeEdit();renderRecent();setSyncBadge('ok','已同步 ✓');toast('記錄已更新！');
+  }catch(err){toast('❌ 更新失敗：'+err.message,8000);}
+  btn.textContent='儲存修改';btn.disabled=false;
+}
+async function delE(id){
+  if(!confirm('確定刪除？'))return;
+  try{
+    await api('deleteEntry',{id:String(id)});
+    entries=entries.filter(e=>String(e.id)!==String(id));
+    renderRecent();setSyncBadge('ok','已同步 ✓');toast('已刪除');
+  }catch(e){toast('❌ 刪除失敗：'+e.message);}
+}
+async function batchDel(btn){
+  const fc=document.getElementById('filterClient').value;
+  const fm=document.getElementById('filterMonth').value;
+  if(!fc&&!fm){alert('請先選擇客戶或月份');return;}
+  const toDelete=entries.filter(e=>{
+    const d=(e.date||'').slice(0,10);
+    if(fc&&e.clientKey!==fc)return false;
+    if(fm&&!d.startsWith(fm))return false;
+    return true;
+  });
+  if(!toDelete.length){alert('沒有符合條件的記錄');return;}
+  if(!confirm('確定刪除 '+toDelete.length+' 條記錄？'))return;
+  btn.textContent='刪除中...';btn.disabled=true;btn.style.opacity='0.5';
+  const ids=toDelete.map(e=>String(e.id));
+  try{
+    try{await api('deleteBatch',{ids});}
+    catch{
+      for(let i=0;i<ids.length;i+=5){
+        await Promise.all(ids.slice(i,i+5).map(id=>api('deleteEntry',{id}).catch(()=>{})));
+        btn.textContent='刪除中... '+Math.min(i+5,ids.length)+'/'+ids.length;
+      }
+    }
+    const s=new Set(ids);entries=entries.filter(e=>!s.has(String(e.id)));
+    renderRecent();if(role==='boss'){renderSum();renderGen();}
+    setSyncBadge('ok','已同步 ✓');toast('✓ 已刪除 '+ids.length+' 條記錄');
+  }catch(err){toast('❌ 失敗：'+err.message,8000);}
+  btn.textContent='批量刪除篩選結果';btn.disabled=false;btn.style.opacity='1';
+}
+
+// ── PRICES ────────────────────────────────────────────────────
+function getPx(ck,month){
+  const h=priceHistory[ck]||[];
+  for(let i=h.length-1;i>=0;i--){const e=h[i];if(month>=e.from&&month<=e.to)return e.px;}
+  return CLIENTS[ck].defPx;
+}
+function getCurPx(ck){const h=priceHistory[ck]||[];return h.length?[...h[h.length-1].px]:[...CLIENTS[ck].defPx];}
+function prevM(m){const[y,mo]=m.split('-').map(Number);return mo===1?`${y-1}-12`:`${y}-${String(mo-1).padStart(2,'0')}`;}
+function nextM(m){const[y,mo]=m.split('-').map(Number);return mo===12?`${y+1}-01`:`${y}-${String(mo+1).padStart(2,'0')}`;}
+
+function renderPrices(){
+  document.getElementById('priceList').innerHTML='';
+  Object.entries(CLIENTS).forEach(([ck,c])=>{
+    const px=getCurPx(ck);
+    const div=document.createElement('div');div.className='card';
+    div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:15px;font-weight:700">${c.sn}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge ${c.type==='inv'?'by':'bb'}">${c.type==='inv'?'Invoice':'月結單'}</span>
+        <button class="btn-green" onclick="savePx('${ck}',this)">儲存修改</button>
+      </div></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">點擊數字即可修改</div>`+
+      c.cols.map((col,i)=>`<div class="px-row"><span style="font-size:13px">${col}</span>
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:var(--text2)">MOP$</span>
+        <input class="px-inp" type="number" step="0.1" min="0" id="px_${ck}_${i}" value="${px[i]}"></div></div>`).join('');
+    document.getElementById('priceList').appendChild(div);
+  });
+}
+function savePx(ck,btn){
+  const c=CLIENTS[ck];
+  const cur=getCurPx(ck);
+  const nw=c.cols.map((_,i)=>parseFloat(document.getElementById(`px_${ck}_${i}`).value)||0);
+  if(nw.every((v,i)=>v===cur[i])){toast('單價沒有變更');return;}
+  const changes=c.cols.map((col,i)=>cur[i]!==nw[i]?`${col}: $${cur[i]} → $${nw[i]}`:null).filter(Boolean);
+  document.getElementById('pxDesc').innerHTML=`<b>${c.sn}</b><br>${changes.join('<br>')}`;
+  pendingPx={ck,nw};
+  document.querySelector('input[name="pxOpt"][value="keep"]').checked=true;
+  document.getElementById('pxOverlay').className='overlay on';
+}
+function cancelPx(){
+  if(pendingPx){const{ck,nw}=pendingPx;const old=getCurPx(ck);CLIENTS[ck].cols.forEach((_,i)=>document.getElementById(`px_${ck}_${i}`).value=old[i]);}
+  pendingPx=null;document.getElementById('pxOverlay').className='overlay';
+}
+async function confirmPx(){
+  if(!pendingPx)return;
+  const{ck,nw}=pendingPx;
+  const opt=document.querySelector('input[name="pxOpt"]:checked').value;
+  if(opt==='keep'){
+    const now=new Date(),from=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const h=priceHistory[ck];if(h.length>0)h[h.length-1].to=prevM(from);
+    h.push({px:[...nw],from,to:'2099-12'});
+  }else{
+    const h=priceHistory[ck];
+    h.push({px:[...nw],from:'2000-01',to:'2099-12'});
+  }
+  try{await api('savePrices',{prices:priceHistory});setSyncBadge('ok','已同步 ✓');toast('單價已更新！');}
+  catch(e){setSyncBadge('err','同步失敗');}
+  pendingPx=null;document.getElementById('pxOverlay').className='overlay';renderPrices();
+}
+
+// ── SUMMARY & GENERATE ────────────────────────────────────────
+function getE(month,ck){return entries.filter(e=>(e.date||'').slice(0,10).startsWith(month)&&e.clientKey===ck);}
+// getEDedup: same as buildInv - one entry per day (latest wins), avoids duplicate inflation
+function getEDedup(month,ck){
+  const em={};
+  getE(month,ck).forEach(e=>{em[(e.date||'').slice(0,10)]=e;});
+  return Object.values(em);
+}
+// Store extra item prices set by boss: {itemName: price}
+const extraPrices=JSON.parse(localStorage.getItem('sunny_extra_prices')||'{}');
+function setExtraPx(name,month){
+  const key='expx_'+name.replace(/[^a-zA-Z0-9]/g,'_');
+  const val=parseFloat(document.getElementById(key)?.value)||0;
+  if(!val){toast('請輸入單價');return;}
+  extraPrices[name]=val;
+  localStorage.setItem('sunny_extra_prices',JSON.stringify(extraPrices));
+  toast('✓ 已設定「'+name+'」單價 MOP$ '+val+'，已計入金額');
+  renderSum();renderGen();
+}
+function calcT(ck,month){
+  const px=getPx(ck,month);
+  return getEDedup(month,ck).reduce((s,e)=>{
+    let total=e.qtys.reduce((ss,q,i)=>ss+q*(px[i]||0),0);
+    // Add extras with boss-set prices
+    if(e.extras)e.extras.forEach(x=>{
+      if(extraPrices[x.name])total+=x.qty*extraPrices[x.name];
+    });
+    return s+total;
+  },0);
+}
+
+function renderSum(){
+  const month=document.getElementById('sumMonth').value;if(!month)return;
+  const[y,m]=month.split('-');let gt=0,cc=0;
+  const grid=document.getElementById('sumGrid');grid.innerHTML='';
+  // Check for entries with extras needing pricing (boss only)
+  if(role==='boss'){
+    // Only show alert if there are extras that don't have a price set yet
+    const needPx=entries.filter(e=>(e.date||'').startsWith(month)&&e.extras&&e.extras.some(x=>!extraPrices[x.name]));
+    const oldAlert=document.getElementById('extrasAlert');if(oldAlert)oldAlert.remove();
+    if(needPx.length>0){
+      const names=[...new Set(needPx.flatMap(e=>e.extras.map(x=>x.name)))];
+      const alertDiv=document.createElement('div');alertDiv.id='extrasAlert';
+      alertDiv.style.cssText='background:#FFF3E0;border:1.5px solid #FFB74D;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;line-height:2';
+      alertDiv.innerHTML='<b>⚠️ 有員工新增品項，請設定單價後才能計入金額</b><br>'+
+        names.map(n=>`<span style="display:inline-flex;align-items:center;gap:8px;margin:4px 8px 4px 0;background:#fff;padding:5px 10px;border-radius:6px;border:1px solid #FFB74D">
+          <b>${n}</b>
+          <input type="number" step="0.1" min="0" placeholder="單價" value="${extraPrices[n]||''}" id="expx_${n.replace(/[^a-zA-Z0-9]/g,'_')}" style="width:70px;padding:4px 6px;border:1.5px solid #CFD8DC;border-radius:5px;font-size:12px;font-family:inherit">
+          <span style="font-size:11px;color:#546E7A">MOP$/件</span>
+          <button onclick="setExtraPx('${n}','${month}')" style="background:#1565C0;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-family:inherit">確認</button>
+        </span>`).join('')+
+        '<br><span style="font-size:11px;color:#546E7A">設定單價後金額會自動更新</span>';
+      grid.parentNode.insertBefore(alertDiv,grid);
+    }
+  }
+  Object.entries(CLIENTS).forEach(([k,c])=>{
+    const es=getEDedup(month,k),tot=calcT(k,month);gt+=tot;if(es.length)cc++;
+    const d=document.createElement('div');d.className='ccard';
+    d.onclick=()=>{go('generate');document.getElementById('genMonth').value=month;renderGen();setTimeout(()=>openPrev(k,month),100);};
+    d.innerHTML=`<span style="position:absolute;top:12px;right:12px" class="badge ${c.type==='inv'?'by':'bb'}">${c.type==='inv'?'Invoice':'月結單'}</span>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${c.sn}</div>
+      <div style="font-size:11px;color:#546E7A">${es.length}條 · ${es.reduce((a,e)=>a+e.total,0)}件</div>
+      <div style="font-size:18px;font-weight:700;color:var(--blue);margin-top:8px">MOP$ ${tot.toFixed(2)}</div>`;
+    grid.appendChild(d);
+  });
+  document.getElementById('sumStats').innerHTML=`
+    <div class="statcard"><div class="stlabel">月份</div><div class="stval" style="font-size:17px">${y}年${parseInt(m)}月</div></div>
+    <div class="statcard"><div class="stlabel">活躍客戶</div><div class="stval">${cc}</div></div>
+    <div class="statcard"><div class="stlabel">總記錄數</div><div class="stval">${entries.filter(e=>(e.date||'').startsWith(month)).length}</div></div>
+    <div class="statcard"><div class="stlabel">月份總收入</div><div class="stval" style="color:var(--green)">MOP$ ${gt.toFixed(0)}</div></div>`;
+}
+function renderGen(){
+  const month=document.getElementById('genMonth').value;
+  const grid=document.getElementById('genGrid');grid.innerHTML='';
+  Object.entries(CLIENTS).forEach(([k,c])=>{
+    const es=getEDedup(month,k),tot=calcT(k,month);
+    const d=document.createElement('div');d.className='ccard';
+    d.innerHTML=`<span style="position:absolute;top:12px;right:12px" class="badge ${c.type==='inv'?'by':'bb'}">${c.type==='inv'?'Invoice':'月結單'}</span>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${c.sn}</div>
+      <div style="font-size:11px;color:#546E7A">${es.length}條 · ${es.reduce((a,e)=>a+e.total,0)}件</div>
+      <div style="font-size:18px;font-weight:700;color:var(--blue);margin-bottom:12px;margin-top:8px">MOP$ ${tot.toFixed(2)}</div>
+      <div style="display:flex;gap:8px"><button class="btn btn-blue" style="flex:1;justify-content:center" onclick="openPrev('${k}','${month}')">預覽 & 下載</button><button class="btn-green" onclick="goEdit('${k}','${month}')">修改</button></div>`;
+    grid.appendChild(d);
+  });
+}
+function goEdit(ck,month){
+  go('entry');
+  document.getElementById('filterClient').value=ck;
+  document.getElementById('filterMonth').value=month;
+  document.getElementById('eClient').value=ck;
+  renderRecent();
+  toast('已篩選 '+CLIENTS[ck].sn+' '+month);
+}
+
+// ── PDF BUILDER ───────────────────────────────────────────────
+function openPrev(ck,month){
+  curCk=ck;curMonth=month;
+  document.getElementById('prevTitle').textContent=CLIENTS[ck].sn+' — '+month;
+  document.getElementById('prevArea').innerHTML=buildHTML(ck,month);
+  document.getElementById('prevOverlay').className='overlay on';
+}
+function closePrev(){document.getElementById('prevOverlay').className='overlay';}
+function buildHTML(ck,month){
+  const c=CLIENTS[ck],es=getE(month,ck).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const[y,m]=month.split('-'),days=new Date(+y,+m,0).getDate();
+  const px=getPx(ck,month);
+  return c.type==='inv'?buildInv(ck,c,es,y,m,days,px):buildCn(c,es,y,m,days,px);
+}
+function buildCn(c,es,y,m,days,px){
+  const em={};es.forEach(e=>em[(e.date||'').slice(0,10)]=e);
+
+  // Collect all extra item names across all entries
+  const extraNames=[];
+  es.forEach(e=>{if(e.extras)e.extras.forEach(x=>{if(!extraNames.includes(x.name))extraNames.push(x.name);});});
+
+  // Build combined cols: standard cols + extra cols
+  const allCols=[...c.cols,...extraNames];
+  const allPx=[...px,...extraNames.map(n=>extraPrices[n]||0)];
+
+  let rows='',gt=0;
+  for(let d=1;d<=days;d++){
+    const dk=`${y}-${m.padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const e=em[dk];
+    // Standard qtys
+    const qtys=e?e.qtys:new Array(c.cols.length).fill(0);
+    // Extra qtys mapped to extraNames
+    const extraQtys=extraNames.map(n=>{
+      if(!e||!e.extras)return 0;
+      const ex=e.extras.find(x=>x.name===n);
+      return ex?ex.qty:0;
+    });
+    const allQtys=[...qtys,...extraQtys];
+    const rt=allQtys.reduce((a,b)=>a+b,0);
+    const pr=allQtys.reduce((s,q,i)=>s+q*(allPx[i]||0),0);
+    if(e)gt+=pr;
+    const z=rt===0,st=z?'color:#AAB7C4':'';
+    rows+=`<tr><td style="${st}">${y}/${m}/${String(d).padStart(2,'0')}</td><td style="${st}">${e?e.ref:''}</td>${allQtys.map(q=>`<td style="text-align:right;${st}">${q}</td>`).join('')}<td style="text-align:right;font-weight:600;${st}">${rt}</td><td style="text-align:right;font-weight:600;${st}">${z?0:pr.toFixed(0)}</td></tr>`;
+  }
+  return `<div class="inv"><div class="invh"><div><div style="font-size:18px;font-weight:700">${CO}</div><div style="font-size:11px;opacity:.8;margin-top:3px">${CO_EN}</div></div><div style="text-align:right"><div style="font-size:16px;font-weight:700">${c.name}</div><div style="font-size:12px;opacity:.8;margin-top:2px">${y}年${parseInt(m)}月</div></div></div><div class="invb"><div style="overflow-x:auto"><table class="invt"><thead><tr><th>日期</th><th>貨單編號</th>${allCols.map((col,i)=>`<th style="text-align:right">${col}${allPx[i]?'($'+allPx[i]+')':''}</th>`).join('')}<th style="text-align:right">總數量</th><th style="text-align:right">總價</th></tr></thead><tbody>${rows}</tbody></table></div><div class="totbox"><span style="font-size:14px;font-weight:700">${y}年${parseInt(m)}月 合計</span><span style="font-size:22px;font-weight:700;color:var(--blue)">MOP$ ${gt.toFixed(0)}</span></div></div></div>`;
+}
+function buildInv(ck,c,es,y,m,days,px){
+  const em={};es.forEach(e=>em[(e.date||'').slice(0,10)]=e);
+  // Collect extra item names
+  const extraNames=[];
+  es.forEach(e=>{if(e.extras)e.extras.forEach(x=>{if(!extraNames.includes(x.name))extraNames.push(x.name);});});
+  const allCols=[...c.cols,...extraNames];
+  const allPx=[...px,...extraNames.map(n=>extraPrices[n]||0)];
+  const ct=new Array(allCols.length).fill(0);
+
+  let rows='',gt=0,tq=0;
+  for(let d=1;d<=days;d++){
+    const dk=`${y}-${m.padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dd=`${y}/${m}/${String(d).padStart(2,'0')}`;
+    const e=em[dk];
+    const qtys=e?e.qtys:new Array(c.cols.length).fill(0);
+    const extraQtys=extraNames.map(n=>{
+      if(!e||!e.extras)return 0;
+      const ex=e.extras.find(x=>x.name===n);
+      return ex?ex.qty:0;
+    });
+    const allQtys=[...qtys,...extraQtys];
+    const rq=allQtys.reduce((a,b)=>a+b,0);
+    const pr=allQtys.reduce((s,q,i)=>s+q*(allPx[i]||0),0);
+    if(e){gt+=pr;tq+=rq;allQtys.forEach((q,i)=>ct[i]+=q);}
+    const z=rq===0,st=z?'color:#AAB7C4':'';
+    rows+=`<tr><td style="${st}">${dd}</td><td style="${st}">${e?e.ref:''}</td>${allQtys.map(q=>`<td style="text-align:right;${st}">${q}</td>`).join('')}<td style="text-align:right;font-weight:600;${st}">${rq}</td><td style="text-align:right;font-weight:600;${st}">${z?'0':pr.toFixed(1)}</td></tr>`;
+  }
+  const sum=c.sum?`<div style="margin-top:14px;padding-top:12px;border-top:2px solid var(--border)"><div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">Monthly Summary</div><table class="sumt"><thead><tr><th style="text-align:left">品項</th><th style="text-align:left">單價</th><th style="text-align:right">總數量</th><th style="text-align:right">小計 MOP$</th></tr></thead><tbody>${allCols.map((col,i)=>`<tr><td>${col}</td><td>MOP$ ${allPx[i]||'待設定'}</td><td style="text-align:right">${ct[i]}</td><td style="text-align:right">${((ct[i])*(allPx[i]||0)).toFixed(2)}</td></tr>`).join('')}<tr style="background:var(--goldbg);font-weight:700"><td colspan="2">合計</td><td style="text-align:right">${tq}</td><td style="text-align:right;color:var(--blue)">MOP$ ${gt.toFixed(2)}</td></tr></tbody></table></div>`:'';
+  const pay=c.pay?`<div style="margin-top:14px;padding:12px 16px;background:#F8F9FA;border-radius:6px;border:1px solid var(--border)"><div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Payment Information / 付款資料</div><div style="font-size:11px;color:var(--text2);line-height:1.9">${BANK.replace(/\n/g,'<br>')}</div></div>`:'';
+  const today=new Date().toLocaleDateString('zh-TW');
+  const invNum = c.invNo||'—';
+  return `<div class="inv"><div class="invh"><div><div style="font-size:26px;font-weight:700;letter-spacing:3px">INVOICE</div><div style="font-size:11px;opacity:.85;margin-top:6px;line-height:2">No. Invoice : ${invNum}<br>Date: ${today}</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:700">${CO}</div><div style="font-size:11px;opacity:.8;margin-top:3px">${CO_EN}</div></div></div><div class="invb"><div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--graybg)"><div style="font-size:14px;font-weight:700;margin-bottom:3px">Bill to: ${c.billTo||''}</div><div style="font-size:11px;color:var(--text2);line-height:1.6">${(c.addr||'').replace(/\n/g,'<br>')}</div></div><div style="overflow-x:auto"><table class="invt"><thead><tr><th>日期</th><th>貨單</th>${allCols.map((col,i)=>`<th style="text-align:right">${col} (MOP$${allPx[i]||'?'})</th>`).join('')}<th style="text-align:right">總量</th><th style="text-align:right">總價</th></tr></thead><tbody>${rows}</tbody></table></div>${sum}<div class="totbox"><span style="font-size:16px;font-weight:700">Total MOP$</span><span style="font-size:26px;font-weight:700;color:var(--blue)">${gt.toFixed(2)}</span></div>${pay}</div></div>`;
+}
+function dlPDF(){
+  if(!curCk||!curMonth)return;
+  const c=CLIENTS[curCk],html=buildHTML(curCk,curMonth),[y,m]=curMonth.split('-');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title></title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Sans TC',sans-serif;background:#fff;color:#1A2332}.inv{border:1px solid #CFD8DC;border-radius:8px;overflow:hidden}.invh{background:#1565C0;color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:flex-start}.invb{padding:22px 28px}.invt{width:100%;border-collapse:collapse;font-size:10.5px}.invt th{background:#F0F4F8;padding:6px 8px;text-align:left;font-weight:600;color:#546E7A;border-bottom:2px solid #CFD8DC}.invt td{padding:5px 8px;border-bottom:1px solid #ECEFF1}.sumt{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:10px}.sumt th{background:#1565C0;color:#fff;padding:6px 9px}.sumt td{padding:5px 9px;border-bottom:1px solid #ECEFF1}.totbox{margin-top:14px;padding:13px 18px;background:#FFFDE7;border:2px solid #F9A825;border-radius:7px;display:flex;justify-content:space-between;align-items:center}@media print{@page{margin:0mm;size:A4}body{padding:8mm}}</style></head><body>${html}<script>window.onload=()=>setTimeout(()=>window.print(),700);<\/script></body></html>`);
+  w.document.close();
+}
+function dlAll(){
+  const month=document.getElementById('genMonth').value;
+  if(!month){alert('請先選擇月份');return;}
+  if(!confirm('確定下載所有客戶收據？'))return;
+  Object.keys(CLIENTS).forEach((k,i)=>setTimeout(()=>{curCk=k;curMonth=month;dlPDF();},i*900));
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+async function saveUrl(btn){
+  const url=document.getElementById('settingsUrl').value.trim();
+  const msg=document.getElementById('urlMsg');
+  localStorage.setItem('sunny_gas_url',url);
+  btn.textContent='測試中...';btn.disabled=true;btn.style.opacity='0.6';
+  msg.textContent='';
+  try{
+    const r=await api('ping');
+    if(r.ok){msg.textContent='✅ 連接成功！v'+(r.v||'?');msg.style.color='var(--green)';await loadCloud();}
+    else{msg.textContent='❌ 回應錯誤';msg.style.color='var(--red)';}
+  }catch(e){msg.textContent='❌ '+e.message;msg.style.color='var(--red)';}
+  btn.textContent='儲存並測試';btn.disabled=false;btn.style.opacity='1';
+}
+async function dedup(btn){
+  const msg=document.getElementById('dedupMsg');
+  if(!confirm('確定清除重複記錄？每個客戶每天只保留第一條。'))return;
+  btn.textContent='分析中...';btn.disabled=true;btn.style.opacity='0.5';
+  await new Promise(r=>setTimeout(r,50));
+  const seen=new Set();const ids=[];
+  [...entries].sort((a,b)=>Number(a.id)-Number(b.id)).forEach(e=>{
+    const key=e.clientKey+'|'+(e.date||'').slice(0,10);
+    if(seen.has(key))ids.push(String(e.id));else seen.add(key);
+  });
+  if(!ids.length){msg.textContent='✅ 沒有重複記錄';msg.style.color='var(--green)';btn.textContent='清除重複記錄';btn.disabled=false;btn.style.opacity='1';return;}
+  msg.textContent='發現 '+ids.length+' 條重複，刪除中...';
+  try{
+    try{await api('deleteBatch',{ids});}
+    catch{
+      for(let i=0;i<ids.length;i+=5){
+        await Promise.all(ids.slice(i,i+5).map(id=>api('deleteEntry',{id}).catch(()=>{})));
+        btn.textContent='刪除中... '+Math.min(i+5,ids.length)+'/'+ids.length;
+      }
+    }
+    const s=new Set(ids);entries=entries.filter(e=>!s.has(String(e.id)));
+    renderRecent();if(role==='boss'){renderSum();renderGen();}
+    setSyncBadge('ok','已同步 ✓');
+    msg.textContent='✅ 已刪除 '+ids.length+' 條重複記錄';msg.style.color='var(--green)';
+    toast('重複記錄已清除！');
+  }catch(e){msg.textContent='❌ 失敗：'+e.message;msg.style.color='var(--red)';}
+  btn.textContent='清除重複記錄';btn.disabled=false;btn.style.opacity='1';
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function renderInvNos(){
+  const el=document.getElementById('invNoList');
+  if(!el)return;
+  // Only show invoice-type clients
+  const invClients=Object.entries(CLIENTS).filter(([k,c])=>c.type==='inv');
+  el.innerHTML=invClients.map(([k,c])=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ECEFF1">
+      <div style="flex:1;font-size:13px;font-weight:500">${c.sn}</div>
+      <div style="font-size:12px;color:var(--text2)">No. Invoice :</div>
+      <input type="text" id="invno_${k}" value="${c.invNo||''}"
+        style="width:80px;padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:14px;font-weight:600;text-align:center;font-family:inherit;outline:none">
+    </div>`).join('');
+}
+
+function saveInvNos(btn){
+  const msg=document.getElementById('invNoMsg');
+  btn.textContent='儲存中...';btn.disabled=true;
+  const invClients=Object.entries(CLIENTS).filter(([k,c])=>c.type==='inv');
+  invClients.forEach(([k,c])=>{
+    const el=document.getElementById('invno_'+k);
+    if(el&&el.value.trim()) CLIENTS[k].invNo=el.value.trim();
+  });
+  // Save to localStorage
+  const saved={};
+  invClients.forEach(([k,c])=>{saved[k]=c.invNo;});
+  localStorage.setItem('sunny_invnos',JSON.stringify(saved));
+  msg.textContent='✅ 已儲存！';msg.style.color='var(--green)';
+  toast('Invoice 編號已更新');
+  btn.textContent='儲存編號';btn.disabled=false;
+  setTimeout(()=>msg.textContent='',3000);
+}
+
+function renderInvNos(){
+  const el=document.getElementById('invNoList');
+  if(!el)return;
+  const invClients=Object.entries(CLIENTS).filter(([k,c])=>c.type==='inv');
+  el.innerHTML=invClients.map(([k,c])=>
+    '<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ECEFF1">'+
+    '<div style="flex:1;font-size:13px;font-weight:500">'+c.sn+'</div>'+
+    '<div style="font-size:12px;color:#546E7A">No. Invoice :</div>'+
+    '<input type="text" id="invno_'+k+'" value="'+(c.invNo||'')+'" '+
+    'style="width:90px;padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:14px;font-weight:600;text-align:center;font-family:inherit;outline:none">'+
+    '</div>'
+  ).join('');
+}
+function saveInvNos(btn){
+  const msg=document.getElementById('invNoMsg');
+  const invClients=Object.entries(CLIENTS).filter(([k,c])=>c.type==='inv');
+  const saved={};
+  invClients.forEach(([k,c])=>{
+    const el=document.getElementById('invno_'+k);
+    if(el&&el.value.trim()){CLIENTS[k].invNo=el.value.trim();saved[k]=el.value.trim();}
+  });
+  localStorage.setItem('sunny_invnos',JSON.stringify(saved));
+  msg.textContent='✅ 已儲存！';msg.style.color='var(--green)';
+  toast('Invoice 編號已更新');
+  setTimeout(()=>msg.textContent='',3000);
+}
+function renderInvNos(){
+  var el=document.getElementById('invNoList');
+  if(!el)return;
+  var invClients=Object.entries(CLIENTS).filter(function(e){return e[1].type==='inv';});
+  var html='';
+  invClients.forEach(function(e){
+    var k=e[0],c=e[1];
+    html+='<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ECEFF1">'+
+      '<div style="flex:1;font-size:13px;font-weight:500">'+c.sn+'</div>'+
+      '<div style="font-size:12px;color:#546E7A">No. Invoice :</div>'+
+      '<input type="text" id="invno_'+k+'" value="'+(c.invNo||'')+'" '+
+      'style="width:90px;padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:14px;font-weight:600;text-align:center;font-family:inherit;outline:none">'+
+      '</div>';
+  });
+  el.innerHTML=html;
+}
+function saveInvNos(btn){
+  var msg=document.getElementById('invNoMsg');
+  var invClients=Object.entries(CLIENTS).filter(function(e){return e[1].type==='inv';});
+  var saved={};
+  invClients.forEach(function(e){
+    var k=e[0],c=e[1];
+    var el=document.getElementById('invno_'+k);
+    if(el&&el.value.trim()){CLIENTS[k].invNo=el.value.trim();saved[k]=el.value.trim();}
+  });
+  localStorage.setItem('sunny_invnos',JSON.stringify(saved));
+  msg.textContent='✅ 已儲存！';msg.style.color='var(--green)';
+  toast('Invoice 編號已更新');
+  setTimeout(function(){msg.textContent='';},3000);
+}
+
+function toast(msg,dur=3000){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',dur);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+(function(){
+  const url=localStorage.getItem('sunny_gas_url');
+  document.getElementById('loginWrap').style.display=url?'flex':'flex';
+  if(!url){
+    // Show setup hint
+    document.getElementById('lerr').textContent='請先登入老闆帳號，在設定頁面輸入GAS網址';
+    document.getElementById('lerr').style.color='#1565C0';
+  }
+})();
+</script>
+</body>
+</html>
