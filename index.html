@@ -116,6 +116,7 @@ td{padding:8px 12px;border-bottom:1px solid var(--graybg);vertical-align:middle}
       <button class="navbtn" id="n-summary" onclick="go('summary')" style="display:none">æçµå®ç¸½è¦½</button>
       <button class="navbtn" id="n-generate" onclick="go('generate')" style="display:none">çæPDFæ¶æ</button>
       <button class="navbtn" id="n-prices" onclick="go('prices')" style="display:none">å®å¹ç®¡ç</button>
+      <button class="navbtn" id="n-income" onclick="go('income')">æ¶å¥</button>
       <div class="nsec">ç³»çµ±</div>
       <button class="navbtn" id="n-settings" onclick="go('settings')" style="display:none">è¨­å®</button>
     </div>
@@ -184,6 +185,7 @@ td{padding:8px 12px;border-bottom:1px solid var(--graybg);vertical-align:middle}
         <div class="mbar">
           <span style="font-size:13px;font-weight:600;color:var(--text2)">æä»½ï¼</span>
           <input class="finput" type="month" id="sumMonth" style="width:155px" onchange="renderSum()">
+          <button class="btn btn-out" style="margin-left:auto" onclick="renderMonthlyRevenue()">ð æ­·æçæ¥­é¡</button>
         </div>
         <div class="statgrid" id="sumStats"></div>
         <div class="cgrid" id="sumGrid"></div>
@@ -242,6 +244,78 @@ td{padding:8px 12px;border-bottom:1px solid var(--graybg);vertical-align:middle}
           <div id="nc2Msg" style="font-size:13px;margin-top:10px;min-height:18px"></div>
         </div>
         <div id="customClientsList"></div>
+      </div>
+
+      <!-- INCOME PAGE -->
+      <div class="page" id="p-income">
+        <div class="ptitle">æ¶å¥</div>
+        <div class="psub">è¨éB2Båä½å¬å¸æ¶æ¬¾ï¼æåºåè¨æ´æ»æ¶å¥åå¶ä»æ¶å¥</div>
+
+        <!-- Company Management -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:14px;font-weight:700">åä½å¬å¸ç®¡ç</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <input class="finput" type="text" id="incCo" placeholder="è¼¸å¥å¬å¸åç¨±" style="flex:1;margin-bottom:0">
+            <button class="btn btn-blue" onclick="addIncomeCo()">æ°å¢å¬å¸</button>
+          </div>
+          <div id="incCoList" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+
+        <!-- Income Entry -->
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px">è¨éæ¶æ¬¾</div>
+          <div class="row2" style="margin-bottom:12px">
+            <div>
+              <label class="flabel">åä½å¬å¸</label>
+              <select class="fsel" id="incCoSel"><option value="">-- è«é¸æå¬å¸ --</option></select>
+            </div>
+            <div>
+              <label class="flabel">æ¥æ</label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input class="finput" type="date" id="incDate" style="flex:1">
+                <button type="button" onclick="document.getElementById('incDate').value=new Date().toISOString().split('T')[0]" style="white-space:nowrap;padding:9px 10px;border:1.5px solid var(--blue);border-radius:7px;font-size:12px;color:var(--blue);background:#E3F2FD;cursor:pointer;font-family:inherit;font-weight:600">ä»æ¥</button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label class="flabel">éé¡ï¼MOP$ï¼</label>
+            <input class="finput" type="number" inputmode="numeric" id="incAmt" placeholder="è¼¸å¥éé¡" min="0" step="0.01" style="max-width:200px">
+          </div>
+          <div style="margin-bottom:12px">
+            <label class="flabel">åè¨»ï¼å¯é¸ï¼</label>
+            <input class="finput" type="text" id="incNote" placeholder="ä¾ï¼11æè¨å®">
+          </div>
+          <button class="btn btn-blue" onclick="saveIncomeEntry()">å²å­æ¶æ¬¾è¨é</button>
+          <div id="incMsg" style="font-size:13px;margin-top:10px;min-height:18px"></div>
+        </div>
+
+        <!-- Monthly Summary -->
+        <div class="card" id="incSummaryCard">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+            <div style="font-size:14px;font-weight:700">æä»½æ¶å¥å½ç¸½</div>
+            <input type="month" id="incMonth" onchange="renderIncomeSummary()" style="padding:7px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:13px;font-family:inherit;outline:none">
+          </div>
+          <div id="incSummaryContent"></div>
+        </div>
+
+        <!-- Records List -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:14px;font-weight:700">æ¶æ¬¾è¨é</div>
+          <div style="display:flex;gap:8px">
+            <select id="incFilterCo" onchange="renderIncomeRecords()" style="padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:12px;font-family:inherit;outline:none">
+              <option value="">ææå¬å¸</option>
+            </select>
+            <input type="month" id="incFilterMonth" onchange="renderIncomeRecords()" style="padding:6px 10px;border:1.5px solid #CFD8DC;border-radius:7px;font-size:12px;font-family:inherit;outline:none">
+          </div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="overflow-x:auto">
+            <table><thead><tr><th>æ¥æ</th><th>å¬å¸</th><th>éé¡</th><th>åè¨»</th><th>æä½</th></tr></thead>
+            <tbody id="incRecordsTb"></tbody></table>
+          </div>
+        </div>
       </div>
 
       <!-- SETTINGS PAGE -->
@@ -349,6 +423,13 @@ td{padding:8px 12px;border-bottom:1px solid var(--graybg);vertical-align:middle}
       <button class="btn btn-out" onclick="cancelPx()">åæ¶</button>
       <button class="btn btn-blue" onclick="confirmPx()">ç¢ºèª</button>
     </div>
+  </div>
+</div>
+
+<!-- REVENUE MODAL -->
+<div class="overlay" id="revOverlay">
+  <div class="modal">
+    <div id="revModalContent"></div>
   </div>
 </div>
 
@@ -537,6 +618,7 @@ function go(id){
   if(id==='settings'){renderInvNos();document.getElementById('settingsUrl').value=getUrl();}
   if(id==='newclient')renderCustomClients();
   if(id==='prices')renderPrices();
+  if(id==='income')initIncomePage();
 }
 
 // ââ SELECTS âââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -745,7 +827,7 @@ async function saveEdit(btn){
     await api('updateEntry',{entry:e});
     closeEdit();renderRecent();
     if(role==='boss'){renderSum();renderGen();}
-    setSyncBadge('ok','å·råæ­¥ â');toast('è¨éå·²æ´æ°ï¼');
+    setSyncBadge('ok','å·²åæ­¥ â');toast('è¨éå·²æ´æ°ï¼');
   }catch(err){toast('â æ´æ°å¤±æï¼'+err.message,8000);}
   btn.textContent='å²å­ä¿®æ¹';btn.disabled=false;
 }
@@ -1063,7 +1145,7 @@ function dlPDF(){
 function dlAll(){
   var month=document.getElementById('genMonth').value;
   if(!month){alert('è«åé¸ææä»½');return;}
-  if(!confirm('ç¢ºå®ä¸è¼ææå®¢æ¶æ¶æï¼'))return;
+  if(!confirm('ç¢ºå®æ¸é¤éè¤è¨éï¼'))return;
   Object.keys(CLIENTS).forEach(function(k,i){setTimeout(function(){curCk=k;curMonth=month;dlPDF();},i*900);});
 }
 
@@ -1087,7 +1169,7 @@ async function saveUrl(btn){
 
 async function dedup(btn){
   var msg=document.getElementById('dedupMsg');
-  if(!confirm('ç¢ºå®æ¸é¤éè¤è¨éï¼æ¯åå®¢æ¶æ¯å¤©åªä¿çç¬¬ä¸æ¢ã'))return;
+  if(!confirm('ç¢ºå®æ¸é¤éè¤è¨éï¼æ¯åå®¢æ¶æ¯å¤©åªä¿çç¬¬$¸æ¢ã'))return;
   btn.textContent='åæä¸­...';btn.disabled=true;btn.style.opacity='0.5';
   await new Promise(function(r){setTimeout(r,50);});
   var seen=new Set(),ids=[];
@@ -1167,7 +1249,7 @@ function addNewClient2(){
   localStorage.setItem('sunny_custom_clients',JSON.stringify(custom));
   CLIENTS[key]=newClient;
   document.getElementById('nc2Name').value='';
-  document.getElementById('nc2ItemsList').innerHTML='';
+  document.getElementById('nc2ItemsLi/'+Strst').innerHTML='';
   _nc2Count=0;
   initSelects();renderCustomClients();
   if(role==='boss')renderPrices();
@@ -1245,6 +1327,238 @@ function saveInvNos(btn){
   msg.textContent='â å·²å²å­ï¼';msg.style.color='var(--green)';
   toast('Invoice ç·¨èå·²æ´æ°');
   setTimeout(function(){msg.textContent='';},3000);
+}
+
+// ââ INCOME ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Storage keys: sunny_income_cos (array of company names), sunny_income_entries (array of {id,co,date,amt,note})
+function getIncomeCos(){
+  try{return JSON.parse(localStorage.getItem('sunny_income_cos')||'[]');}catch(e){return[];}
+}
+function saveIncomeCos(arr){localStorage.setItem('sunny_income_cos',JSON.stringify(arr));}
+function getIncomeEntries(){
+  try{return JSON.parse(localStorage.getItem('sunny_income_entries')||'[]');}catch(e){return[];}
+}
+function saveIncomeEntries(arr){localStorage.setItem('sunny_income_entries',JSON.stringify(arr));}
+
+function addIncomeCo(){
+  var val=(document.getElementById('incCo').value||'').trim();
+  if(!val){toast('è«è¼¸å¥å¬å¸åç¨±');return;}
+  var cos=getIncomeCos();
+  if(cos.indexOf(val)>=0){toast('å¬å¸åç¨±å·²å­å¨');return;}
+  cos.push(val);
+  saveIncomeCos(cos);
+  document.getElementById('incCo').value='';
+  renderIncomeCoList();
+  renderIncomeCoSelects();
+  toast('â å·²æ°å¢ã'+val+'ã');
+}
+
+function deleteIncomeCo(name){
+  if(!confirm('ç¢ºå®åªé¤ã'+name+'ãå¬å¸ï¼ç¸éæ¶æ¬¾è¨éä¸æåªé¤ã'))return;
+  var cos=getIncomeCos().filter(function(c){return c!==name;});
+  saveIncomeCos(cos);
+  renderIncomeCoList();
+  renderIncomeCoSelects();
+}
+
+function renderIncomeCoList(){
+  var cos=getIncomeCos();
+  var el=document.getElementById('incCoList');if(!el)return;
+  if(!cos.length){el.innerHTML='<div style="font-size:12px;color:#90A4AE">å°æªæ°å¢å¬å¸</div>';return;}
+  el.innerHTML=cos.map(function(co){
+    return '<div style="display:inline-flex;align-items:center;gap:6px;background:#E3F2FD;border:1px solid #90CAF9;border-radius:20px;padding:5px 12px;font-size:13px">'+
+      '<span style="font-weight:500">'+co+'</span>'+
+      '<button onclick="deleteIncomeCo(\''+co.replace(/'/g,"\\'")+'\')" style="background:none;border:none;color:#EF5350;cursor:pointer;font-size:16px;line-height:1;padding:0">Ã</button>'+
+    '</div>';
+  }).join('');
+}
+
+function renderIncomeCoSelects(){
+  var cos=getIncomeCos();
+  ['incCoSel','incFilterCo'].forEach(function(sid){
+    var s=document.getElementById(sid);if(!s)return;
+    var placeholder=sid==='incFilterCo'?'<option value="">ææå¬å¸</option>':'<option value="">-- è«é¸æå¬å¸ --</option>';
+    s.innerHTML=placeholder+cos.map(function(co){
+      return '<option value="'+co+'">'+co+'</option>';
+    }).join('');
+  });
+}
+
+function saveIncomeEntry(){
+  var co=(document.getElementById('incCoSel').value||'').trim();
+  var date=document.getElementById('incDate').value;
+  var amt=parseFloat(document.getElementById('incAmt').value);
+  var note=(document.getElementById('incNote').value||'').trim();
+  var msg=document.getElementById('incMsg');
+  if(!co){msg.textContent='è«é¸æå¬å¸';msg.style.color='var(--red)';return;}
+  if(!date){msg.textContent='è«é¸ææ¥æ';msg.style.color='var(--red)';return;}
+  if(!amt||amt<=0){msg.textContent='è«è¼¸å¥ææéé¡';msg.style.color='var(--red)';return;}
+  var entries2=getIncomeEntries();
+  entries2.push({id:Date.now(),co:co,date:date.slice(0,10),amt:amt,note:note});
+  saveIncomeEntries(entries2);
+  document.getElementById('incCoSel').value='';
+  document.getElementById('incAmt').value='';
+  document.getElementById('incNote').value='';
+  msg.textContent='â å·²å²å­ï¼';msg.style.color='var(--green)';
+  setTimeout(function(){msg.textContent='';},3000);
+  renderIncomeRecords();
+  renderIncomeSummary();
+  toast('â æ¶æ¬¾è¨éå·²å²å­ï¼');
+}
+
+function deleteIncomeEntry(id){
+  if(!confirm('ç¢ºå®åªé¤éç­æ¶æ¬¾è¨éï¼'))return;
+  var entries2=getIncomeEntries().filter(function(e){return String(e.id)!==String(id);});
+  saveIncomeEntries(entries2);
+  renderIncomeRecords();
+  renderIncomeSummary();
+  toast('å·²åªé¤');
+}
+
+function renderIncomeRecords(){
+  var fc=document.getElementById('incFilterCo')?document.getElementById('incFilterCo').value:'';
+  var fm=document.getElementById('incFilterMonth')?document.getElementById('incFilterMonth').value:'';
+  var entries2=getIncomeEntries().filter(function(e){
+    if(fc&&e.co!==fc)return false;
+    if(fm&&!(e.date||'').startsWith(fm))return false;
+    return true;
+  }).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+  var tb=document.getElementById('incRecordsTb');if(!tb)return;
+  tb.innerHTML=entries2.map(function(e){
+    return '<tr>'+
+      '<td>'+e.date+'</td>'+
+      '<td><span class="badge bb">'+e.co+'</span></td>'+
+      '<td style="font-weight:700;color:var(--green)">MOP$ '+Number(e.amt).toFixed(0)+'</td>'+
+      '<td style="color:var(--text2);font-size:12px">'+(e.note||'â')+'</td>'+
+      '<td><button class="btn-red" onclick="deleteIncomeEntry(\''+e.id+'\')">åª</button></td>'+
+    '</tr>';
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:#546E7A;padding:20px">æ²æè¨é</td></tr>';
+}
+
+function renderIncomeSummary(){
+  var month=document.getElementById('incMonth')?document.getElementById('incMonth').value:'';
+  var el=document.getElementById('incSummaryContent');if(!el)return;
+  if(!month){el.innerHTML='<div style="font-size:13px;color:#90A4AE">è«é¸ææä»½</div>';return;}
+
+  // Laundry revenue from entries
+  var laundryTotal=0;
+  entries.filter(function(e){return (e.date||'').startsWith(month);}).forEach(function(e){
+    laundryTotal+=calcEntryAmt(e);
+  });
+
+  // Income entries for this month
+  var incEntries=getIncomeEntries().filter(function(e){return (e.date||'').startsWith(month);});
+  var incTotal=incEntries.reduce(function(s,e){return s+Number(e.amt);},0);
+
+  // Group income by company
+  var byCo={};
+  incEntries.forEach(function(e){
+    if(!byCo[e.co])byCo[e.co]=0;
+    byCo[e.co]+=Number(e.amt);
+  });
+
+  var grandTotal=laundryTotal+incTotal;
+  var parts=month.split('-');
+  var label=parts[0]+'å¹´'+parseInt(parts[1])+'æ';
+
+  el.innerHTML=
+    '<div style="font-size:13px;font-weight:700;color:#546E7A;margin-bottom:10px">'+label+' ToB æä»½å½ç¸½</div>'+
+    '<div style="background:#E8F5E9;border:1px solid #C8E6C9;border-radius:8px;padding:12px 16px;margin-bottom:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<div><div style="font-size:12px;color:#546E7A">æ´æ»æ¶å¥</div><div style="font-size:11px;color:#90A4AE;margin-top:2px">ï¼æçµå®+Invoiceåè¨ï¼</div></div>'+
+        '<div style="font-size:20px;font-weight:700;color:var(--green)">MOP$ '+laundryTotal.toFixed(0)+'</div>'+
+      '</div>'+
+    '</div>'+
+    (Object.keys(byCo).length?
+      '<div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:8px;padding:12px 16px;margin-bottom:10px">'+
+        '<div style="font-size:12px;color:#546E7A;margin-bottom:8px">å¶ä»æ¶å¥ï¼åä½å¬å¸ï¼</div>'+
+        Object.entries(byCo).map(function(p){
+          return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #BBDEFB;font-size:13px">'+
+            '<span>'+p[0]+'</span><span style="font-weight:700;color:var(--blue)">MOP$ '+p[1].toFixed(0)+'</span>'+
+          '</div>';
+        }).join('')+
+        '<div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:700">'+
+          '<span>å°è¨</span><span style="color:var(--blue)">MOP$ '+incTotal.toFixed(0)+'</span>'+
+        '</div>'+
+      '</div>'
+    :
+      '<div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:8px;padding:12px 16px;margin-bottom:10px;font-size:13px;color:#90A4AE">'+
+        'æ¬ææ²æå¶ä»æ¶å¥è¨é'+
+      '</div>'
+    )+
+    '<div style="background:var(--goldbg);border:2px solid var(--gold);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">'+
+      '<div><div style="font-size:13px;font-weight:700">'+label+' ToB ç¸½æ¶å¥</div><div style="font-size:11px;color:#546E7A;margin-top:2px">æ´æ» MOP$'+laundryTotal.toFixed(0)+' + å¶ä» MOP$'+incTotal.toFixed(0)+'</div></div>'+
+      '<div style="font-size:24px;font-weight:700;color:var(--blue)">MOP$ '+grandTotal.toFixed(0)+'</div>'+
+    '</div>';
+}
+
+function initIncomePage(){
+  // Set default date
+  var d=document.getElementById('incDate');
+  if(d&&!d.value)d.value=new Date().toISOString().split('T')[0];
+  // Set default month
+  var now=new Date();
+  var m=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var im=document.getElementById('incMonth');
+  if(im&&!im.value)im.value=m;
+  renderIncomeCoList();
+  renderIncomeCoSelects();
+  renderIncomeRecords();
+  renderIncomeSummary();
+}
+
+// Monthly revenue breakdown (all months with data)
+function renderMonthlyRevenue(){
+  // Collect all months from entries
+  var monthSet={};
+  entries.forEach(function(e){
+    var mo=(e.date||'').slice(0,7);
+    if(mo)monthSet[mo]=true;
+  });
+  getIncomeEntries().forEach(function(e){
+    var mo=(e.date||'').slice(0,7);
+    if(mo)monthSet[mo]=true;
+  });
+  var months=Object.keys(monthSet).sort().reverse();
+  if(!months.length){
+    toast('å°æªæä»»ä½è¨é');return;
+  }
+  // Build modal content
+  var html='<div style="font-size:15px;font-weight:700;margin-bottom:16px">åæä»½çæ¥­é¡</div>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px">'+
+    '<thead><tr>'+
+    '<th style="background:#F0F4F8;padding:9px 12px;text-align:left;font-weight:600;color:#546E7A;border-bottom:2px solid #CFD8DC">æä»½</th>'+
+    '<th style="background:#F0F4F8;padding:9px 12px;text-align:right;font-weight:600;color:#546E7A;border-bottom:2px solid #CFD8DC">æ´æ»æ¶å¥</th>'+
+    '<th style="background:#F0F4F8;padding:9px 12px;text-align:right;font-weight:600;color:#546E7A;border-bottom:2px solid #CFD8DC">å¶ä»æ¶å¥</th>'+
+    '<th style="background:#F0F4F8;padding:9px 12px;text-align:right;font-weight:600;color:#546E7A;border-bottom:2px solid #CFD8DC">æä»½åè¨</th>'+
+    '</tr></thead><tbody>';
+  var grandLaundry=0,grandInc=0;
+  months.forEach(function(mo){
+    var laundry=0;
+    entries.filter(function(e){return (e.date||'').startsWith(mo);}).forEach(function(e){laundry+=calcEntryAmt(e);});
+    var inc=getIncomeEntries().filter(function(e){return (e.date||'').startsWith(mo);}).reduce(function(s,e){return s+Number(e.amt);},0);
+    var tot=laundry+inc;
+    grandLaundry+=laundry;grandInc+=inc;
+    var parts=mo.split('-');
+    html+='<tr>'+
+      '<td style="padding:9px 12px;border-bottom:1px solid #ECEFF1;font-weight:600">'+parts[0]+'å¹´'+parseInt(parts[1])+'æ</td>'+
+      '<td style="padding:9px 12px;border-bottom:1px solid #ECEFF1;text-align:right;color:var(--green)">MOP$ '+laundry.toFixed(0)+'</td>'+
+      '<td style="padding:9px 12px;border-bottom:1px solid #ECEFF1;text-align:right;color:var(--blue)">MOP$ '+inc.toFixed(0)+'</td>'+
+      '<td style="padding:9px 12px;border-bottom:1px solid #ECEFF1;text-align:right;font-weight:700">MOP$ '+tot.toFixed(0)+'</td>'+
+    '</tr>';
+  });
+  var grandTotal=grandLaundry+grandInc;
+  html+='<tr style="background:var(--goldbg)">'+
+    '<td style="padding:10px 12px;font-weight:700">åè¨</td>'+
+    '<td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--green)">MOP$ '+grandLaundry.toFixed(0)+'</td>'+
+    '<td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--blue)">MOP$ '+grandInc.toFixed(0)+'</td>'+
+    '<td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--blue);font-size:15px">MOP$ '+grandTotal.toFixed(0)+'</td>'+
+  '</tr>'+
+  '</tbody></table>'+
+  '<div style="display:flex;justify-content:flex-end;margin-top:16px">'+
+  '<button class="btn btn-out" onclick="document.getElementById(\'revOverlay\').className=\'overlay\'">éé</button></div>';
+  document.getElementById('revModalContent').innerHTML=html;
+  document.getElementById('revOverlay').className='overlay on';
 }
 
 // ââ TOAST âââââââââââââââââââââââââââââââââââââââââââââââââââââ
