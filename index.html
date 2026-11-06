@@ -1352,22 +1352,33 @@ function openEditClientPrices(key){
   var saveBtn=document.createElement('button');
   saveBtn.textContent='儲存';
   saveBtn.style.cssText='flex:1;background:#1976D2;color:#fff;border:none;padding:10px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit';
-  saveBtn.onclick=function(){
+  saveBtn.onclick=async function(){
     var newPx=[];
     c.cols.forEach(function(col,i){
       var v=parseFloat(document.getElementById('ecp_'+i).value);
       newPx.push(isNaN(v)?0:v);
     });
+    // Update custom client defPx in localStorage
     var updCustom=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
     updCustom[key].defPx=newPx;
     localStorage.setItem('sunny_custom_clients',JSON.stringify(updCustom));
     CLIENTS[key].defPx=newPx;
-    // Update priceHistory for this client
+    // Update priceHistory: replace all history (retroactive) so old records recalculate correctly
     priceHistory[key]=[{px:[...newPx],from:'2000-01',to:'2099-12'}];
-    initSelects();renderCustomClients();
-    if(role==='boss')renderPrices();
-    overlay.style.display='none';
-    toast('✅ 「'+c.sn+'」單價已更新！');
+    // Sync to cloud
+    msg.style.color='#1976D2';msg.textContent='⏳ 儲存中...';
+    saveBtn.disabled=true;
+    try{
+      await api('savePrices',{prices:priceHistory});
+      setSyncBadge('ok','已同步 ✓');
+      initSelects();renderCustomClients();
+      if(role==='boss')renderPrices();
+      overlay.style.display='none';
+      toast('✅ 「'+c.sn+'」單價已更新，月結單金額已重新計算！');
+    }catch(err){
+      msg.style.color='var(--red)';msg.textContent='❌ 同步失敗，請重試';
+      saveBtn.disabled=false;
+    }
   };
   var cancelBtn=document.createElement('button');
   cancelBtn.textContent='取消';
