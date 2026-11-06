@@ -977,9 +977,28 @@ async function confirmPx(){
 // ── SUMMARY & GENERATE ────────────────────────────────────────
 function getE(month,ck){return entries.filter(function(e){return (e.date||'').slice(0,10).startsWith(month)&&e.clientKey===ck;});}
 function getEDedup(month,ck){
-  var em={};
-  getE(month,ck).forEach(function(e){em[(e.date||'').slice(0,10)]=e;});
-  return Object.values(em);
+  // Remove zero-total entries if a non-zero entry exists on the same date
+  // Also remove exact duplicates (same qtys), but keep entries with different qtys (two batches)
+  var byDate={};
+  getE(month,ck).forEach(function(e){
+    var d=(e.date||'').slice(0,10);
+    if(!byDate[d])byDate[d]=[];
+    byDate[d].push(e);
+  });
+  var result=[];
+  Object.values(byDate).forEach(function(es){
+    if(es.length===1){result.push(es[0]);return;}
+    // Remove zero-total if non-zero exists
+    var hasNonZero=es.some(function(e){return (e.total||0)>0;});
+    var filtered=hasNonZero?es.filter(function(e){return (e.total||0)>0;}):es;
+    // Remove exact duplicates (same qtys stringified)
+    var seen=new Set();
+    filtered.forEach(function(e){
+      var key=JSON.stringify(e.qtys||[]);
+      if(!seen.has(key)){seen.add(key);result.push(e);}
+    });
+  });
+  return result;
 }
 
 function setExtraPx(name,month){
@@ -1687,7 +1706,23 @@ function renderMonthlyRevenue(){
   var grandLaundry=0,grandInc=0;
   months.forEach(function(mo){
     var laundry=0;
-    entries.filter(function(e){return (e.date||'').startsWith(mo);}).forEach(function(e){laundry+=calcEntryAmt(e);});
+    // Use same dedup logic as renderSum: remove zero-total if non-zero exists on same date+client, remove exact dups
+    var moEntries=entries.filter(function(e){return (e.date||'').startsWith(mo);});
+    var dedupMap={};
+    moEntries.forEach(function(e){
+      var dk=(e.clientKey||'')+'|'+(e.date||'').slice(0,10);
+      if(!dedupMap[dk])dedupMap[dk]=[];
+      dedupMap[dk].push(e);
+    });
+    Object.values(dedupMap).forEach(function(es){
+      var hasNonZero=es.some(function(e){return (e.total||0)>0;});
+      var filtered=hasNonZero?es.filter(function(e){return (e.total||0)>0;}):es;
+      var seen=new Set();
+      filtered.forEach(function(e){
+        var key=JSON.stringify(e.qtys||[]);
+        if(!seen.has(key)){seen.add(key);laundry+=calcEntryAmt(e);}
+      });
+    });
     var inc=getIncomeEntries().filter(function(e){return (e.date||'').startsWith(mo);}).reduce(function(s,e){return s+Number(e.amt);},0);
     var tot=laundry+inc;
     grandLaundry+=laundry;grandInc+=inc;
