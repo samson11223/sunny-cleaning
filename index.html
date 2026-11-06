@@ -534,6 +534,24 @@ async function loadCloud(){
     });
     // Normalize dates
     entries.forEach(function(e){if(e.date&&e.date.length>10)e.date=e.date.slice(0,10);});
+    // Fix legacy custom key mismatch: entries may use a different key encoding than CLIENTS
+    // Strategy: find unknown entry keys and unknown custom clients, pair them 1-to-1
+    var customInStorage=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
+    var entryCustomKeys=[...new Set(entries.map(function(e){return e.clientKey||'';}))].filter(function(k){return k.startsWith('custom_');});
+    // Unknown entry keys = custom keys in entries not in CLIENTS
+    var unknownEntryKeys=entryCustomKeys.filter(function(ek){return !CLIENTS[ek];});
+    // Unknown custom clients = custom clients in localStorage not already a known CLIENTS key
+    var unknownClientKeys=Object.keys(customInStorage).filter(function(ck){return !CLIENTS[ck];});
+    // Pair them 1-to-1 in order (most cases: exactly one of each)
+    unknownEntryKeys.forEach(function(ek,i){
+      var matchKey=unknownClientKeys[i]||null;
+      if(matchKey){
+        // Remap all entries using old key to the correct new key
+        entries.forEach(function(e){if(e.clientKey===ek)e.clientKey=matchKey;});
+        // Also copy priceHistory if needed
+        if(!priceHistory[matchKey]&&priceHistory[ek])priceHistory[matchKey]=[...priceHistory[ek]];
+      }
+    });
     setSyncBadge('ok','已同步 ✓ ('+entries.length+'條)');
     renderRecent();
     if(role==='boss'){renderSum();renderGen();renderPrices();}
@@ -1303,6 +1321,25 @@ function deleteCustomClient(key){
   toast('已刪除');
 }
 
+// Find all entry keys that belong to a custom client (handles legacy key encoding)
+function findEntryKeysForCustomClient(key,sn){
+  var matched=[key];
+  var custom=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
+  var c=custom[key];
+  if(!c)return matched;
+  var colCount=c.cols?c.cols.length:0;
+  // Find entry keys with same col count that have no matching custom client definition
+  var allEntryKeys=[...new Set(entries.map(function(e){return e.clientKey||'';}))];
+  allEntryKeys.forEach(function(ek){
+    if(!ek||ek===key||!ek.startsWith('custom_'))return;
+    if(custom[ek])return; // already defined, skip
+    // Check if entries for this key have same col count
+    var sample=entries.find(function(e){return e.clientKey===ek&&e.qtys;});
+    if(sample&&sample.qtys.length===colCount)matched.push(ek);
+  });
+  return matched;
+}
+
 function openEditClientPrices(key){
   var custom=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
   var c=custom[key];
@@ -1365,6 +1402,11 @@ function openEditClientPrices(key){
     CLIENTS[key].defPx=newPx;
     // Update priceHistory: replace all history (retroactive) so old records recalculate correctly
     priceHistory[key]=[{px:[...newPx],from:'2000-01',to:'2099-12'}];
+    // Also find any entry keys that map to this same custom client (handles legacy key encoding)
+    var entryKeysForClient=findEntryKeysForCustomClient(key,c.sn);
+    entryKeysForClient.forEach(function(ek){
+      if(ek!==key)priceHistory[ek]=[{px:[...newPx],from:'2000-01',to:'2099-12'}];
+    });
     // Sync to cloud
     msg.style.color='#1976D2';msg.textContent='⏳ 儲存中...';
     saveBtn.disabled=true;
