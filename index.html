@@ -534,22 +534,40 @@ async function loadCloud(){
     });
     // Normalize dates
     entries.forEach(function(e){if(e.date&&e.date.length>10)e.date=e.date.slice(0,10);});
-    // Fix legacy custom key mismatch: entries may use a different key encoding than CLIENTS
-    // Strategy: find unknown entry keys and unknown custom clients, pair them 1-to-1
+    // Fix legacy custom key mismatch: entries may use an old key encoding not matching CLIENTS
+    // Strategy: for each unrecognized custom entry key, pair it with a localStorage custom client
+    // by stripping the random suffix and comparing the name part
     var customInStorage=JSON.parse(localStorage.getItem('sunny_custom_clients')||'{}');
     var entryCustomKeys=[...new Set(entries.map(function(e){return e.clientKey||'';}))].filter(function(k){return k.startsWith('custom_');});
-    // Unknown entry keys = custom keys in entries not in CLIENTS
+    // Keys in entries that are NOT in CLIENTS need remapping
     var unknownEntryKeys=entryCustomKeys.filter(function(ek){return !CLIENTS[ek];});
-    // Unknown custom clients = custom clients in localStorage not already a known CLIENTS key
-    var unknownClientKeys=Object.keys(customInStorage).filter(function(ck){return !CLIENTS[ck];});
-    // Pair them 1-to-1 in order (most cases: exactly one of each)
-    unknownEntryKeys.forEach(function(ek,i){
-      var matchKey=unknownClientKeys[i]||null;
+    // All localStorage custom clients (whether or not already in CLIENTS)
+    var allStorageKeys=Object.keys(customInStorage);
+    unknownEntryKeys.forEach(function(ek){
+      // Find best match: a storage key not already used as an alias for another entry key
+      // Simple strategy: find storage keys whose name part overlaps, or just use first unmatched one
+      var matchKey=null;
+      // Try to find by stripping suffix (last __XXXX part) and comparing
+      var ekBase=ek.replace(/__[^_]+$/,'');
+      allStorageKeys.forEach(function(ck){
+        if(!matchKey){
+          var ckBase=ck.replace(/__[^_]+$/,'');
+          if(ckBase===ekBase)matchKey=ck;
+        }
+      });
+      // Fallback: pick first storage key that isn't already a recognized entry key
+      if(!matchKey){
+        allStorageKeys.forEach(function(ck){
+          if(!matchKey&&!entryCustomKeys.includes(ck))matchKey=ck;
+        });
+      }
       if(matchKey){
         // Remap all entries using old key to the correct new key
         entries.forEach(function(e){if(e.clientKey===ek)e.clientKey=matchKey;});
         // Also copy priceHistory if needed
         if(!priceHistory[matchKey]&&priceHistory[ek])priceHistory[matchKey]=[...priceHistory[ek]];
+        // Make sure CLIENTS knows this key
+        if(!CLIENTS[matchKey]&&customInStorage[matchKey])CLIENTS[matchKey]=customInStorage[matchKey];
       }
     });
     setSyncBadge('ok','已同步 ✓ ('+entries.length+'條)');
